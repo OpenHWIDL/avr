@@ -1,0 +1,1094 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soc name="atmega_xx0_1_core" partial="true">
+    <description>ATmega 640, 1280, 1281, 2560 and 2561 core definition</description>
+
+    <constantTable>
+        <constant name="RAM_START" type="void*" value="0x200"/>
+        <constant name="RAM_SIZE" type="int32_t" value="0x2000"/>
+        <constant name="RAM_END" type="void*" value="0x2200"/>
+        <constant name="EEPROM_SIZE" type="int32_t" value="0x1000"/>
+    </constantTable>
+
+    <registerTypeTable>
+        <registerType name="SREG" width="8" mode="RW">
+            <description>AVR Status Register</description>
+            <flagSubfield name="I" offset="7"><description>Global Interrupt Enable</description></flagSubfield>
+            <flagSubfield name="T" offset="6"><description>Bit Copy Storage</description></flagSubfield>
+            <flagSubfield name="H" offset="5"><description>Half Carry Flag</description></flagSubfield>
+            <flagSubfield name="S" offset="4"><description>Sign Bit</description></flagSubfield>
+            <flagSubfield name="V" offset="3"><description>Two's Complement Overflow Flag</description></flagSubfield>
+            <flagSubfield name="N" offset="2"><description>Negative Flag</description></flagSubfield>
+            <flagSubfield name="Z" offset="1"><description>Zero Flag</description></flagSubfield>
+            <flagSubfield name="C" offset="0"><description>Carry Flag</description></flagSubfield>
+        </registerType>
+        <registerType name="SP" width="16" mode="RW">
+            <description>Stack Pointer</description>
+            <integralSubfield name="SP" offset="0" width="16"/>
+        </registerType>
+        <registerType name="RAMPZ" width="8" mode="RW">
+            <description>Extended Z-pointer Register for ELPM/SPM</description>
+            <integralSubfield name="RAMPZ" offset="0" width="8"/>
+        </registerType>
+        <registerType name="EIND" width="8" mode="RW">
+            <description>Extended Indirect Register</description>
+            <integralSubfield name="EIND" offset="0" width="8"/>
+        </registerType>
+        <registerType name="GPIOR" width="8" mode="RW">
+            <description>General Purpose I/O Register</description>
+            <integralSubfield name="GPIOR" offset="0" width="8"/>
+        </registerType>
+        <registerType name="XMCRA" width="8" mode="RW">
+            <description>External Memory Control Register A</description>
+            <flagSubfield name="SRE" offset="7"><description>External SRAM/XMEM Enable</description></flagSubfield>
+            <enumSubfield name="SRL" mask="0x70">
+                <description>Wait-state Sector Limit</description>
+                <enumValue name="SplitAt0x2200" value="0x00"/>
+                <enumValue name="SplitAt0x4000" value="0x20"/>
+                <enumValue name="SplitAt0x6000" value="0x30"/>
+                <enumValue name="SplitAt0x8000" value="0x40"/>
+                <enumValue name="SplitAt0xA000" value="0x50"/>
+                <enumValue name="SplitAt0xC000" value="0x60"/>
+                <enumValue name="SplitAt0xE000" value="0x70"/>
+            </enumSubfield>
+            <enumSubfield name="SRW_UP" mask="0x0C">
+                <description>Wait-state Select Bits for Upper Sector</description>
+                <enumValue name="NoWaitState" value="0x00"/>
+                <enumValue name="WaitOneCycleRW" value="0x04"/>
+                <enumValue name="WaitTwoCycleRW" value="0x08"/>
+                <enumValue name="WaitTwoCycleRWAndOneCycleDriving" value="0x0C"/>
+            </enumSubfield>
+            <enumSubfield name="SRW_LOW" mask="0x03">
+                <description>Wait-state Select Bits for Lower Sector</description>
+                <enumValue name="NoWaitState" value="0x00"/>
+                <enumValue name="WaitOneCycleRW" value="0x01"/>
+                <enumValue name="WaitTwoCycleRW" value="0x02"/>
+                <enumValue name="WaitTwoCycleRWAndOneCycleDriving" value="0x03"/>
+            </enumSubfield>
+        </registerType>
+        <registerType name="XMCRB" width="8" mode="RW">
+            <description>External Memory Control Register B</description>
+            <flagSubfield name="XMBK" offset="7"><description>External Memory Bus-keeper Enable</description></flagSubfield>
+            <enumSubfield name="XMM" mask="0x07">
+                <description>External Memory High mask</description>
+                <enumValue name="HighBits8" value="0x00"/>
+                <enumValue name="HighBits7" value="0x01"/>
+                <enumValue name="HighBits6" value="0x02"/>
+                <enumValue name="HighBits5" value="0x03"/>
+                <enumValue name="HighBits4" value="0x04"/>
+                <enumValue name="HighBits3" value="0x05"/>
+                <enumValue name="HighBits2" value="0x06"/>
+                <enumValue name="HighBitsNone" value="0x07"/>
+            </enumSubfield>
+        </registerType>
+        <registerType name="OSCCAL" width="8" mode="RW">
+            <description>Oscillator Calibration Register</description>
+            <integralSubfield name="OSCCAL" offset="0" width="8"/>
+        </registerType>
+        <registerType name="CLKPR" width="8" mode="RW">
+            <description>Clock Rrescale Register</description>
+            <flagSubfield name="CLKPCE" offset="7"><description>Clock Prescaler Change Enable</description></flagSubfield>
+            <enumSubfield name="CLKPS" mask="0x0F">
+                <description>Clock Prescaler Select Bits</description>
+                <enumValue name="DivideBy1" value="0x00"/>
+                <enumValue name="DivideBy2" value="0x01"/>
+                <enumValue name="DivideBy4" value="0x02"/>
+                <enumValue name="DivideBy8" value="0x03"/>
+                <enumValue name="DivideBy16" value="0x04"/>
+                <enumValue name="DivideBy32" value="0x05"/>
+                <enumValue name="DivideBy64" value="0x06"/>
+                <enumValue name="DivideBy128" value="0x07"/>
+                <enumValue name="DivideBy256" value="0x08"/>
+            </enumSubfield>
+        </registerType>
+        <registerType name="SMCR" width="8" mode="RW">
+            <description>Sleep Mode Control Register</description>
+            <enumSubfield name="SM" mask="0x0E">
+                <description>Sleep Mode Select Bits</description>
+                <enumValue name="Idle" value="0x00"/>
+                <enumValue name="ADCNoiseReduction" value="0x02"/>
+                <enumValue name="PowerDown" value="0x04"/>
+                <enumValue name="PowerSave" value="0x06"/>
+                <enumValue name="Standby" value="0x0C"/>
+                <enumValue name="ExtendedStandby" value="0x0E"/>
+            </enumSubfield>
+            <flagSubfield name="SE" offset="0"><description>Sleep Enable</description></flagSubfield>
+        </registerType>
+        <registerType name="PRR0" width="8" mode="RW">
+            <description>Power Reduction Register 0</description>
+            <flagSubfield name="PRTWI" offset="7"><description>Power Reduction TWI</description></flagSubfield>
+            <flagSubfield name="PRTIM2" offset="6"><description>Power Reduction Timer/Counter2</description></flagSubfield>
+            <flagSubfield name="PRTIM0" offset="5"><description>Power Reduction Timer/Counter0</description></flagSubfield>
+            <flagSubfield name="PRTIM1" offset="3"><description>Power Reduction Timer/Counter1</description></flagSubfield>
+            <flagSubfield name="PRSPI" offset="2"><description>Power Reduction serial peripheral interface</description></flagSubfield>
+            <flagSubfield name="PRUSART0" offset="1"><description>Power Reduction USART0</description></flagSubfield>
+            <flagSubfield name="PRADC" offset="0"><description>Power Reduction ADC</description></flagSubfield>
+        </registerType>
+        <registerType name="PRR1" width="8" mode="RW">
+            <description>Power Reduction Register 1</description>
+            <flagSubfield name="PRTIM5" offset="5"><description>Power Reduction Timer/Counter5</description></flagSubfield>
+            <flagSubfield name="PRTIM4" offset="4"><description>Power Reduction Timer/Counter4</description></flagSubfield>
+            <flagSubfield name="PRTIM3" offset="3"><description>Power Reduction Timer/Counter3</description></flagSubfield>
+            <flagSubfield name="PRUSART3" offset="2"><description>Power Reduction USART3</description></flagSubfield>
+            <flagSubfield name="PRUSART2" offset="1"><description>Power Reduction USART2</description></flagSubfield>
+            <flagSubfield name="PRUSART1" offset="0"><description>Power Reduction USART1</description></flagSubfield>
+        </registerType>
+        <registerType name="MCUSR" width="8" mode="RW">
+            <description>MCU Status Register</description>
+            <flagSubfield name="JTRF" offset="4"><description>JTAG Reset Flag</description></flagSubfield>
+            <flagSubfield name="WDRF" offset="3"><description>Watchdog Reset Flag</description></flagSubfield>
+            <flagSubfield name="BORF" offset="2"><description>Brown-out Reset Flag</description></flagSubfield>
+            <flagSubfield name="EXTRF" offset="1"><description>External Reset Flag</description></flagSubfield>
+            <flagSubfield name="PORF" offset="0"><description>Power-on Reset Flag</description></flagSubfield>
+        </registerType>
+        <registerType name="WDTCSR" width="8" mode="RW">
+            <description>Watchdog Timer Control Register</description>
+            <flagSubfield name="WDIF" offset="7"><description>Watchdog Interrupt Flag</description></flagSubfield>
+            <flagSubfield name="WDIE" offset="6"><description>Watchdog Interrupt Enable</description></flagSubfield>
+            <flagSubfield name="WDCE" offset="4"><description>Watchdog Change Enable</description></flagSubfield>
+            <flagSubfield name="WDE" offset="3"><description>Watchdog System Reset Enable</description></flagSubfield>
+            <enumSubfield name="WDP" mask="0x27">
+                <description>Watchdog Timer Prescaler</description>
+                <enumValue name="Cycles2K" value="0x00"/>
+                <enumValue name="Cycles4K" value="0x01"/>
+                <enumValue name="Cycles8K" value="0x02"/>
+                <enumValue name="Cycles16K" value="0x03"/>
+                <enumValue name="Cycles32K" value="0x04"/>
+                <enumValue name="Cycles64K" value="0x05"/>
+                <enumValue name="Cycles128K" value="0x06"/>
+                <enumValue name="Cycles256K" value="0x07"/>
+                <enumValue name="Cycles512K" value="0x20"/>
+                <enumValue name="Cycles1024K" value="0x21"/>
+            </enumSubfield>
+        </registerType>
+        <registerType name="MCUCR" width="8" mode="RW">
+            <description>MCU Control Register</description>
+            <flagSubfield name="JTD" offset="7"><description>JTAG Interface Disable</description></flagSubfield>
+            <flagSubfield name="PUD" offset="4"><description>Pull-up Disable</description></flagSubfield>
+            <flagSubfield name="IVSEL" offset="1"><description>Interrupt Vector Select</description></flagSubfield>
+            <flagSubfield name="IVCE" offset="0"><description>Interrupt Vector Change Enable</description></flagSubfield>
+        </registerType>
+        <registerType name="EICRA" width="8" mode="RW">
+            <description>External Interrupt Control Register A</description>
+            <enumSubfield name="ISC3" mask="0xC0">
+                <description>External Interrupt 3 Sense Control Bits</description>
+                <enumValue name="LowLevelInt" value="0x00"/>
+                <enumValue name="AnyEdgeInt" value="0x40"/>
+                <enumValue name="FallingEdgeInt" value="0x80"/>
+                <enumValue name="RisingEdgeInt" value="0xC0"/>
+            </enumSubfield>
+            <enumSubfield name="ISC2" mask="0x30">
+                <description>External Interrupt 2 Sense Control Bits</description>
+                <enumValue name="LowLevelInt" value="0x00"/>
+                <enumValue name="AnyEdgeInt" value="0x10"/>
+                <enumValue name="FallingEdgeInt" value="0x20"/>
+                <enumValue name="RisingEdgeInt" value="0x30"/>
+            </enumSubfield>
+            <enumSubfield name="ISC1" mask="0x0C">
+                <description>External Interrupt 1 Sense Control Bits</description>
+                <enumValue name="LowLevelInt" value="0x00"/>
+                <enumValue name="AnyEdgeInt" value="0x04"/>
+                <enumValue name="FallingEdgeInt" value="0x08"/>
+                <enumValue name="RisingEdgeInt" value="0x0C"/>
+            </enumSubfield>
+            <enumSubfield name="ISC0" mask="0x03">
+                <description>External Interrupt 0 Sense Control Bits</description>
+                <enumValue name="LowLevelInt" value="0x00"/>
+                <enumValue name="AnyEdgeInt" value="0x01"/>
+                <enumValue name="FallingEdgeInt" value="0x02"/>
+                <enumValue name="RisingEdgeInt" value="0x03"/>
+            </enumSubfield>
+        </registerType>
+        <registerType name="EICRB" width="8" mode="RW">
+            <description>External Interrupt Control Register B</description>
+            <enumSubfield name="ISC7" mask="0xC0">
+                <description>External Interrupt 7 Sense Control Bits</description>
+                <enumValue name="LowLevelInt" value="0x00"/>
+                <enumValue name="AnyEdgeInt" value="0x40"/>
+                <enumValue name="FallingEdgeInt" value="0x80"/>
+                <enumValue name="RisingEdgeInt" value="0xC0"/>
+            </enumSubfield>
+            <enumSubfield name="ISC6" mask="0x30">
+                <description>External Interrupt 6 Sense Control Bits</description>
+                <enumValue name="LowLevelInt" value="0x00"/>
+                <enumValue name="AnyEdgeInt" value="0x10"/>
+                <enumValue name="FallingEdgeInt" value="0x20"/>
+                <enumValue name="RisingEdgeInt" value="0x30"/>
+            </enumSubfield>
+            <enumSubfield name="ISC5" mask="0x0C">
+                <description>External Interrupt 5 Sense Control Bits</description>
+                <enumValue name="LowLevelInt" value="0x00"/>
+                <enumValue name="AnyEdgeInt" value="0x04"/>
+                <enumValue name="FallingEdgeInt" value="0x08"/>
+                <enumValue name="RisingEdgeInt" value="0x0C"/>
+            </enumSubfield>
+            <enumSubfield name="ISC4" mask="0x03">
+                <description>External Interrupt 4 Sense Control Bits</description>
+                <enumValue name="LowLevelInt" value="0x00"/>
+                <enumValue name="AnyEdgeInt" value="0x01"/>
+                <enumValue name="FallingEdgeInt" value="0x02"/>
+                <enumValue name="RisingEdgeInt" value="0x03"/>
+            </enumSubfield>
+        </registerType>
+        <registerType name="EIMSK" width="8" mode="RW">
+            <description>External Interrupt Mask Register</description>
+            <flagSubfield name="INT7" offset="7"><description>External Interrupt Request 7 Enable</description></flagSubfield>
+            <flagSubfield name="INT6" offset="6"><description>External Interrupt Request 6 Enable</description></flagSubfield>
+            <flagSubfield name="INT5" offset="5"><description>External Interrupt Request 5 Enable</description></flagSubfield>
+            <flagSubfield name="INT4" offset="4"><description>External Interrupt Request 4 Enable</description></flagSubfield>
+            <flagSubfield name="INT3" offset="3"><description>External Interrupt Request 3 Enable</description></flagSubfield>
+            <flagSubfield name="INT2" offset="2"><description>External Interrupt Request 2 Enable</description></flagSubfield>
+            <flagSubfield name="INT1" offset="1"><description>External Interrupt Request 1 Enable</description></flagSubfield>
+            <flagSubfield name="INT0" offset="0"><description>External Interrupt Request 0 Enable</description></flagSubfield>
+        </registerType>
+        <registerType name="EIFR" width="8" mode="RW">
+            <description>External Interrupt Flag Register</description>
+            <flagSubfield name="INTF7" offset="7"><description>External Interrupt Flag 7</description></flagSubfield>
+            <flagSubfield name="INTF6" offset="6"><description>External Interrupt Flag 6</description></flagSubfield>
+            <flagSubfield name="INTF5" offset="5"><description>External Interrupt Flag 5</description></flagSubfield>
+            <flagSubfield name="INTF4" offset="4"><description>External Interrupt Flag 4</description></flagSubfield>
+            <flagSubfield name="INTF3" offset="3"><description>External Interrupt Flag 3</description></flagSubfield>
+            <flagSubfield name="INTF2" offset="2"><description>External Interrupt Flag 2</description></flagSubfield>
+            <flagSubfield name="INTF1" offset="1"><description>External Interrupt Flag 1</description></flagSubfield>
+            <flagSubfield name="INTF0" offset="0"><description>External Interrupt Flag 0</description></flagSubfield>
+        </registerType>
+        <registerType name="PCICR" width="8" mode="RW">
+            <description>Pin Change Interrupt Control Register</description>
+            <flagSubfield name="PCIE2" offset="2"><description>Pin Change Interrupt Enable 2</description></flagSubfield>
+            <flagSubfield name="PCIE1" offset="1"><description>Pin Change Interrupt Enable 1</description></flagSubfield>
+            <flagSubfield name="PCIE0" offset="0"><description>Pin Change Interrupt Enable 0</description></flagSubfield>
+        </registerType>
+        <registerType name="PCIFR" width="8" mode="RW">
+            <description>Pin Change Interrupt Flag Register</description>
+            <flagSubfield name="PCIF2" offset="2"><description>Pin Change Interrupt Flag 2</description></flagSubfield>
+            <flagSubfield name="PCIF1" offset="1"><description>Pin Change Interrupt Flag 1</description></flagSubfield>
+            <flagSubfield name="PCIF0" offset="0"><description>Pin Change Interrupt Flag 0</description></flagSubfield>
+        </registerType>
+        <registerType name="PCMSK2" width="8" mode="RW">
+            <description>Pin Change Mask Register 2</description>
+            <flagSubfield name="PCINT23" offset="7"><description>Pin Change Enable Mask 23</description></flagSubfield>
+            <flagSubfield name="PCINT22" offset="6"><description>Pin Change Enable Mask 22</description></flagSubfield>
+            <flagSubfield name="PCINT21" offset="5"><description>Pin Change Enable Mask 21</description></flagSubfield>
+            <flagSubfield name="PCINT20" offset="4"><description>Pin Change Enable Mask 20</description></flagSubfield>
+            <flagSubfield name="PCINT19" offset="3"><description>Pin Change Enable Mask 19</description></flagSubfield>
+            <flagSubfield name="PCINT18" offset="2"><description>Pin Change Enable Mask 18</description></flagSubfield>
+            <flagSubfield name="PCINT17" offset="1"><description>Pin Change Enable Mask 17</description></flagSubfield>
+            <flagSubfield name="PCINT16" offset="0"><description>Pin Change Enable Mask 16</description></flagSubfield>
+        </registerType>
+        <registerType name="PCMSK1" width="8" mode="RW">
+            <description>Pin Change Mask Register 1</description>
+            <flagSubfield name="PCINT15" offset="7"><description>Pin Change Enable Mask 15</description></flagSubfield>
+            <flagSubfield name="PCINT14" offset="6"><description>Pin Change Enable Mask 14</description></flagSubfield>
+            <flagSubfield name="PCINT13" offset="5"><description>Pin Change Enable Mask 13</description></flagSubfield>
+            <flagSubfield name="PCINT12" offset="4"><description>Pin Change Enable Mask 12</description></flagSubfield>
+            <flagSubfield name="PCINT11" offset="3"><description>Pin Change Enable Mask 11</description></flagSubfield>
+            <flagSubfield name="PCINT10" offset="2"><description>Pin Change Enable Mask 10</description></flagSubfield>
+            <flagSubfield name="PCINT9" offset="1"><description>Pin Change Enable Mask 9</description></flagSubfield>
+            <flagSubfield name="PCINT8" offset="0"><description>Pin Change Enable Mask 8</description></flagSubfield>
+        </registerType>
+        <registerType name="PCMSK0" width="8" mode="RW">
+            <description>Pin Change Mask Register 0</description>
+            <flagSubfield name="PCINT7" offset="7"><description>Pin Change Enable Mask 7</description></flagSubfield>
+            <flagSubfield name="PCINT6" offset="6"><description>Pin Change Enable Mask 6</description></flagSubfield>
+            <flagSubfield name="PCINT5" offset="5"><description>Pin Change Enable Mask 5</description></flagSubfield>
+            <flagSubfield name="PCINT4" offset="4"><description>Pin Change Enable Mask 4</description></flagSubfield>
+            <flagSubfield name="PCINT3" offset="3"><description>Pin Change Enable Mask 3</description></flagSubfield>
+            <flagSubfield name="PCINT2" offset="2"><description>Pin Change Enable Mask 2</description></flagSubfield>
+            <flagSubfield name="PCINT1" offset="1"><description>Pin Change Enable Mask 1</description></flagSubfield>
+            <flagSubfield name="PCINT0" offset="0"><description>Pin Change Enable Mask 0</description></flagSubfield>
+        </registerType>
+        <registerType name="GTCCR" width="8" mode="RW">
+            <description>General Timer/Counter Control Register</description>
+            <flagSubfield name="TSM" offset="7"><description>Timer/Counter Synchronization Mode</description></flagSubfield>
+            <flagSubfield name="PSRASY" offset="1"><description>Prescaler Reset for Asynchronous Timer/Counters</description></flagSubfield>
+            <flagSubfield name="PSRSYNC" offset="0"><description>Prescaler Reset for Synchronous Timer/Counters</description></flagSubfield>
+        </registerType>
+        <registerType name="OCDR" width="8" mode="RW">
+            <description>On-chip Debug Related Register in I/O Memory</description>
+            <integralSubfield name="OCDR" offset="0" width="8"/>
+        </registerType>
+        <registerType name="SPMCSR" width="8" mode="RW">
+            <description>Store Program Memory Control and Status Register</description>
+            <flagSubfield name="SPMIE" offset="7"><description>SPM Interrupt Enable</description></flagSubfield>
+            <flagSubfield name="RWWSB" offset="6" mode="RO"><description>Read-While-Write Section Busy</description></flagSubfield>
+            <flagSubfield name="SIGRD" offset="5"><description>Signature Row Read</description></flagSubfield>
+            <flagSubfield name="RWWSRE" offset="4"><description>Read-While-Write Section Read Enable</description></flagSubfield>
+            <flagSubfield name="BLBSET" offset="3"><description>Boot Lock Bit Set</description></flagSubfield>
+            <flagSubfield name="PGWRT" offset="2"><description>Page Write</description></flagSubfield>
+            <flagSubfield name="PGERS" offset="1"><description>Page Erase</description></flagSubfield>
+            <flagSubfield name="SPMEN" offset="0"><description>Store Program Memory Enable</description></flagSubfield>
+        </registerType>
+    </registerTypeTable>
+
+    <deviceTypeTable>
+        <deviceType name="EEPROM">
+            <description>EEPROM</description>
+            <registerTypeTable>
+                <registerType name="EEAR" width="16" mode="RW">
+                    <description>EEPROM Address Register</description>
+                    <integralSubfield name="EEAR" offset="0" width="12"/>
+                </registerType>
+                <registerType name="EEDR" width="8" mode="RW">
+                    <description>EEPROM Data Register</description>
+                    <integralSubfield name="EEDR" offset="0" width="8"/>
+                </registerType>
+                <registerType name="EECR" width="8" mode="RW">
+                    <description>EEPROM Control Register</description>
+                    <enumSubfield name="EEPM" mask="0x30">
+                        <description>EEPROM Programming Mode Bit</description>
+                        <enumValue name="EraseWrite" value="0x00"/>
+                        <enumValue name="EraseOnly" value="0x10"/>
+                        <enumValue name="WriteOnly" value="0x20"/>
+                    </enumSubfield>
+                    <flagSubfield name="EERIE" offset="3"><description>EEPROM Ready Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="EEMPE" offset="2"><description>EEPROM Master Programming Enable</description></flagSubfield>
+                    <flagSubfield name="EEPE" offset="1"><description>EEPROM Programming Enable</description></flagSubfield>
+                    <flagSubfield name="EERE" offset="0"><description>EEPROM Read Enable</description></flagSubfield>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="EECR" type="EECR" address="0x00"/>
+                <registerInstance name="EEDR" type="EEDR" address="0x01"/>
+                <registerInstance name="EEAR" type="EEAR" address="0x02"/>
+            </layout>
+        </deviceType>
+        <deviceType name="GPIO8CH">
+            <description>8-channel GPIO</description>
+            <registerTypeTable>
+                <registerType name="PORT" width="8" mode="RW">
+                    <description>Port Data Register</description>
+                    <flagSubfield name="PORT7" offset="7"></flagSubfield>
+                    <flagSubfield name="PORT6" offset="6"></flagSubfield>
+                    <flagSubfield name="PORT5" offset="5"></flagSubfield>
+                    <flagSubfield name="PORT4" offset="4"></flagSubfield>
+                    <flagSubfield name="PORT3" offset="3"></flagSubfield>
+                    <flagSubfield name="PORT2" offset="2"></flagSubfield>
+                    <flagSubfield name="PORT1" offset="1"></flagSubfield>
+                    <flagSubfield name="PORT0" offset="0"></flagSubfield>
+                </registerType>
+                <registerType name="DDR" width="8" mode="RW">
+                    <description>Port Data Direction Register</description>
+                    <flagSubfield name="DDR7" offset="7"></flagSubfield>
+                    <flagSubfield name="DDR6" offset="6"></flagSubfield>
+                    <flagSubfield name="DDR5" offset="5"></flagSubfield>
+                    <flagSubfield name="DDR4" offset="4"></flagSubfield>
+                    <flagSubfield name="DDR3" offset="3"></flagSubfield>
+                    <flagSubfield name="DDR2" offset="2"></flagSubfield>
+                    <flagSubfield name="DDR1" offset="1"></flagSubfield>
+                    <flagSubfield name="DDR0" offset="0"></flagSubfield>
+                </registerType>
+                <registerType name="PIN" width="8" mode="RW">
+                    <description>Port Input Pins Address</description>
+                    <flagSubfield name="PIN7" offset="7"></flagSubfield>
+                    <flagSubfield name="PIN6" offset="6"></flagSubfield>
+                    <flagSubfield name="PIN5" offset="5"></flagSubfield>
+                    <flagSubfield name="PIN4" offset="4"></flagSubfield>
+                    <flagSubfield name="PIN3" offset="3"></flagSubfield>
+                    <flagSubfield name="PIN2" offset="2"></flagSubfield>
+                    <flagSubfield name="PIN1" offset="1"></flagSubfield>
+                    <flagSubfield name="PIN0" offset="0"></flagSubfield>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="PIN" type="PIN" address="0x00"/>
+                <registerInstance name="DDR" type="DDR" address="0x01"/>
+                <registerInstance name="PORT" type="PORT" address="0x02"/>
+            </layout>
+        </deviceType>
+        <deviceType name="GPIO6CH">
+            <description>6-channel GPIO</description>
+            <registerTypeTable>
+                <registerType name="PORT" width="8" mode="RW">
+                    <description>Port Data Register</description>
+                    <flagSubfield name="PORT5" offset="5"></flagSubfield>
+                    <flagSubfield name="PORT4" offset="4"></flagSubfield>
+                    <flagSubfield name="PORT3" offset="3"></flagSubfield>
+                    <flagSubfield name="PORT2" offset="2"></flagSubfield>
+                    <flagSubfield name="PORT1" offset="1"></flagSubfield>
+                    <flagSubfield name="PORT0" offset="0"></flagSubfield>
+                </registerType>
+                <registerType name="DDR" width="8" mode="RW">
+                    <description>Port Data Direction Register</description>
+                    <flagSubfield name="DDR5" offset="5"></flagSubfield>
+                    <flagSubfield name="DDR4" offset="4"></flagSubfield>
+                    <flagSubfield name="DDR3" offset="3"></flagSubfield>
+                    <flagSubfield name="DDR2" offset="2"></flagSubfield>
+                    <flagSubfield name="DDR1" offset="1"></flagSubfield>
+                    <flagSubfield name="DDR0" offset="0"></flagSubfield>
+                </registerType>
+                <registerType name="PIN" width="8" mode="RW">
+                    <description>Port Input Pins Address</description>
+                    <flagSubfield name="PIN5" offset="5"></flagSubfield>
+                    <flagSubfield name="PIN4" offset="4"></flagSubfield>
+                    <flagSubfield name="PIN3" offset="3"></flagSubfield>
+                    <flagSubfield name="PIN2" offset="2"></flagSubfield>
+                    <flagSubfield name="PIN1" offset="1"></flagSubfield>
+                    <flagSubfield name="PIN0" offset="0"></flagSubfield>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="PIN" type="PIN" address="0x00"/>
+                <registerInstance name="DDR" type="DDR" address="0x01"/>
+                <registerInstance name="PORT" type="PORT" address="0x02"/>
+            </layout>
+        </deviceType>
+        <deviceType name="Timer8B">
+            <description>8-bit Timer/Counter with PWM</description>
+            <registerTypeTable>
+                <registerType name="TCCRA" width="8" mode="RW">
+                    <description>Timer/Counter Control Register A</description>
+                    <enumSubfield name="COMA" mask="0xC0">
+                        <description>Compare Match Output A Mode</description>
+                        <enumValue name="Normal" value="0x00"/>
+                        <enumValue name="Toggle" value="0x40"/>
+                        <enumValue name="Clear" value="0x80"/>
+                        <enumValue name="Set" value="0xC0"/>
+                    </enumSubfield>
+                    <enumSubfield name="COMB" mask="0x30">
+                        <description>Compare Match Output B Mode</description>
+                        <enumValue name="Normal" value="0x00"/>
+                        <enumValue name="Toggle" value="0x10"/>
+                        <enumValue name="Clear" value="0x20"/>
+                        <enumValue name="Set" value="0x30"/>
+                    </enumSubfield>
+                    <flagSubfield name="WGM1" offset="1"></flagSubfield>
+                    <flagSubfield name="WGM0" offset="0"></flagSubfield>
+                </registerType>
+                <registerType name="TCCRB" width="8" mode="RW">
+                    <description>Timer/Counter Control Register B</description>
+                    <flagSubfield name="FOCA" offset="7"><description>Force Output Compare A</description></flagSubfield>
+                    <flagSubfield name="FOCB" offset="6"><description>Force Output Compare B</description></flagSubfield>
+                    <flagSubfield name="WGM2" offset="3"></flagSubfield>
+                    <enumSubfield name="CS" mask="0x07">
+                        <description>Clock Select</description>
+                        <enumValue name="NoClockSource" value="0x00"/>
+                        <enumValue name="IOClock" value="0x01"/>
+                        <enumValue name="IOClockDividedBy8" value="0x02"/>
+                        <enumValue name="IOClockDividedBy64" value="0x03"/>
+                        <enumValue name="IOClockDividedBy256" value="0x04"/>
+                        <enumValue name="IOClockDividedBy1024" value="0x05"/>
+                        <enumValue name="ExternalFallingEdge" value="0x06"/>
+                        <enumValue name="ExternalRisingEdge" value="0x07"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="TCNT" width="8" mode="RW">
+                    <description>Timer/Counter Register</description>
+                    <integralSubfield name="TCNT" offset="0" width="8"/>
+                </registerType>
+                <registerType name="OCR" width="8" mode="RW">
+                    <description>Output Compare Register</description>
+                    <integralSubfield name="OCR" offset="0" width="8"/>
+                </registerType>
+                <registerType name="TIMSK" width="8" mode="RW">
+                    <description>Timer/Counter Interrupt Mask Register</description>
+                    <flagSubfield name="OCIEB" offset="2"><description>Timer/Counter Output Compare Match B Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="OCIEA" offset="1"><description>Timer/Counter Output Compare Match A Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="TOIE" offset="0"><description>Timer/Counter Overflow Interrupt Enable</description></flagSubfield>
+                </registerType>
+                <registerType name="TIFR" width="8" mode="RW">
+                    <description>Timer/Counter Interrupt Flag Register</description>
+                    <flagSubfield name="OCFB" offset="2"><description>Timer/Counter Output Compare B Match Flag</description></flagSubfield>
+                    <flagSubfield name="OCFA" offset="1"><description>Timer/Counter Output Compare A Match Flag</description></flagSubfield>
+                    <flagSubfield name="TOV" offset="0"><description>Timer/Counter Overflow Flag</description></flagSubfield>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="TCCRA" type="TCCRA" address="0x00"/>
+                <registerInstance name="TCCRB" type="TCCRB" address="0x01"/>
+                <registerInstance name="TCNT" type="TCNT" address="0x02"/>
+                <registerInstance name="OCRA" type="OCR" address="0x03"/>
+                <registerInstance name="OCRB" type="OCR" address="0x04"/>
+            </layout>
+        </deviceType>
+        <deviceType name="Timer16B">
+            <description>16-bit Timer/Counter</description>
+            <registerTypeTable>
+                <registerType name="TCCRA" width="8" mode="RW">
+                    <description>Timer/Counter Control Register A</description>
+                    <enumSubfield name="COMA" mask="0xC0">
+                        <description>Compare Output Mode for Channel A</description>
+                        <enumValue name="Normal" value="0x00"/>
+                        <enumValue name="Toggle" value="0x40"/>
+                        <enumValue name="Clear" value="0x80"/>
+                        <enumValue name="Set" value="0xC0"/>
+                    </enumSubfield>
+                    <enumSubfield name="COMB" mask="0x70">
+                        <description>Compare Output Mode for Channel B</description>
+                        <enumValue name="Normal" value="0x00"/>
+                        <enumValue name="Toggle" value="0x10"/>
+                        <enumValue name="Clear" value="0x20"/>
+                        <enumValue name="Set" value="0x30"/>
+                    </enumSubfield>
+                    <enumSubfield name="COMC" mask="0x0C">
+                        <description>Compare Output Mode for Channel C</description>
+                        <enumValue name="Normal" value="0x00"/>
+                        <enumValue name="Toggle" value="0x04"/>
+                        <enumValue name="Clear" value="0x08"/>
+                        <enumValue name="Set" value="0x0C"/>
+                    </enumSubfield>
+                    <flagSubfield name="WGM1" offset="1"></flagSubfield>
+                    <flagSubfield name="WGM0" offset="0"></flagSubfield>
+                </registerType>
+                <registerType name="TCCRB" width="8" mode="RW">
+                    <description>Timer/Counter Control Register B</description>
+                    <flagSubfield name="ICNC" offset="7"><description>Input Capture Noise Canceler</description></flagSubfield>
+                    <flagSubfield name="ICES" offset="6"><description>Input Capture Edge Select</description></flagSubfield>
+                    <flagSubfield name="WGM3" offset="4"></flagSubfield>
+                    <flagSubfield name="WGM2" offset="3"></flagSubfield>
+                    <enumSubfield name="CS" mask="0x07">
+                        <description>Clock Select</description>
+                        <enumValue name="NoClockSource" value="0x00"/>
+                        <enumValue name="IOClock" value="0x01"/>
+                        <enumValue name="IOClockDividedBy8" value="0x02"/>
+                        <enumValue name="IOClockDividedBy64" value="0x03"/>
+                        <enumValue name="IOClockDividedBy256" value="0x04"/>
+                        <enumValue name="IOClockDividedBy1024" value="0x05"/>
+                        <enumValue name="ExternalFallingEdge" value="0x06"/>
+                        <enumValue name="ExternalRisingEdge" value="0x07"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="TCCRC" width="8" mode="RW">
+                    <description>Timer/Counter Control Register C</description>
+                    <flagSubfield name="FOCA" offset="7"><description>Force Output Compare for Channel A</description></flagSubfield>
+                    <flagSubfield name="FOCB" offset="6"><description>Force Output Compare for Channel B</description></flagSubfield>
+                    <flagSubfield name="FOCC" offset="5"><description>Force Output Compare for Channel C</description></flagSubfield>
+                </registerType>
+                <registerType name="TCNT" width="16" mode="RW">
+                    <description>Timer/Counter</description>
+                    <integralSubfield name="TCNT" offset="0" width="16"/>
+                </registerType>
+                <registerType name="OCR" width="16" mode="RW">
+                    <description>Output Compare Register</description>
+                    <integralSubfield name="OCR" offset="0" width="16"/>
+                </registerType>
+                <registerType name="ICR" width="16" mode="RW">
+                    <description>Input Capture Register</description>
+                    <integralSubfield name="ICR" offset="0" width="16"/>
+                </registerType>
+                <registerType name="TIMSK" width="8" mode="RW">
+                    <description>Timer/Counter Interrupt Mask Register</description>
+                    <flagSubfield name="ICIE" offset="5"><description>Timer/Counter Input Capture Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="OCIEC" offset="3"><description>Timer/Counter Output Compare C Match Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="OCIEB" offset="2"><description>Timer/Counter Output Compare B Match Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="OCIEA" offset="1"><description>Timer/Counter Output Compare A Match Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="TOIE" offset="0"><description>Timer/Counter Overflow Interrupt Enable</description></flagSubfield>
+                </registerType>
+                <registerType name="TIFR" width="8" mode="RW">
+                    <description>Timer/Counter Interrupt Flag Register</description>
+                    <flagSubfield name="ICF" offset="5"><description>Timer/Counter Input Capture Flag</description></flagSubfield>
+                    <flagSubfield name="OCFC" offset="3"><description>Timer/Counter Output Compare C Match Flag</description></flagSubfield>
+                    <flagSubfield name="OCFB" offset="2"><description>Timer/Counter Output Compare B Match Flag</description></flagSubfield>
+                    <flagSubfield name="OCFA" offset="1"><description>Timer/Counter Output Compare A Match Flag</description></flagSubfield>
+                    <flagSubfield name="TOV" offset="0"><description>Timer/Counter Overflow Flag</description></flagSubfield>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="TCCRA" type="TCCRA" address="0x00"/>
+                <registerInstance name="TCCRB" type="TCCRB" address="0x01"/>
+                <registerInstance name="TCCRC" type="TCCRC" address="0x02"/>
+                <registerInstance name="TCNT" type="TCNT" address="0x04"/>
+                <registerInstance name="ICR" type="ICR" address="0x06"/>
+                <registerInstance name="OCRA" type="OCR" address="0x08"/>
+                <registerInstance name="OCRB" type="OCR" address="0x0A"/>
+                <registerInstance name="OCRC" type="OCR" address="0x0C"/>
+            </layout>
+        </deviceType>
+        <deviceType name="Timer8BAsync">
+            <description>8-bit Timer/Counter with PWM and Asynchronous Operation</description>
+            <registerTypeTable>
+                <registerType name="TCCRA" width="8" mode="RW">
+                    <description>Timer/Counter Control Register A</description>
+                    <enumSubfield name="COMA" mask="0xC0">
+                        <description>Compare Match Output A Mode</description>
+                        <enumValue name="Normal" value="0x00"/>
+                        <enumValue name="Toggle" value="0x40"/>
+                        <enumValue name="Clear" value="0x80"/>
+                        <enumValue name="Set" value="0xC0"/>
+                    </enumSubfield>
+                    <enumSubfield name="COMB" mask="0x30">
+                        <description>Compare Match Output B Mode</description>
+                        <enumValue name="Normal" value="0x00"/>
+                        <enumValue name="Toggle" value="0x10"/>
+                        <enumValue name="Clear" value="0x20"/>
+                        <enumValue name="Set" value="0x30"/>
+                    </enumSubfield>
+                    <flagSubfield name="WGM1" offset="1"></flagSubfield>
+                    <flagSubfield name="WGM0" offset="0"></flagSubfield>
+                </registerType>
+                <registerType name="TCCRB" width="8" mode="RW">
+                    <description>Timer/Counter Control Register B</description>
+                    <flagSubfield name="FOCA" offset="7"><description>Force Output Compare A</description></flagSubfield>
+                    <flagSubfield name="FOCB" offset="6"><description>Force Output Compare B</description></flagSubfield>
+                    <flagSubfield name="WGM2" offset="3"></flagSubfield>
+                    <enumSubfield name="CS" mask="0x07">
+                        <description>Clock Select</description>
+                        <enumValue name="NoClockSource" value="0x00"/>
+                        <enumValue name="T2SClock" value="0x01"/>
+                        <enumValue name="T2SClockDividedBy8" value="0x02"/>
+                        <enumValue name="T2SClockDividedBy32" value="0x03"/>
+                        <enumValue name="T2SClockDividedBy64" value="0x04"/>
+                        <enumValue name="T2SClockDividedBy128" value="0x05"/>
+                        <enumValue name="T2SClockDividedBy256" value="0x06"/>
+                        <enumValue name="T2SClockDividedBy1024" value="0x07"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="TCNT" width="8" mode="RW">
+                    <description>Timer/Counter Register</description>
+                    <integralSubfield name="TCNT" offset="0" width="8"/>
+                </registerType>
+                <registerType name="OCR" width="8" mode="RW">
+                    <description>Output Compare Register</description>
+                    <integralSubfield name="OCR" offset="0" width="8"/>
+                </registerType>
+                <registerType name="ASSR" width="8" mode="RW">
+                    <description>Asynchronous Status Register</description>
+                    <flagSubfield name="EXCLK" offset="6"><description>Enable External Clock Input</description></flagSubfield>
+                    <flagSubfield name="AS" offset="5"><description>Asynchronous Timer/Counter</description></flagSubfield>
+                    <flagSubfield name="TCNUB" offset="4" mode="RO"><description>Timer/Counter Update Busy</description></flagSubfield>
+                    <flagSubfield name="OCRAUB" offset="3" mode="RO"><description>Output Compare Register Update Busy</description></flagSubfield>
+                    <flagSubfield name="OCRBUB" offset="2" mode="RO"><description>Output Compare Register Update Busy</description></flagSubfield>
+                    <flagSubfield name="TCRAUB" offset="1" mode="RO"><description>Timer/Counter Controler Register Update Busy</description></flagSubfield>
+                    <flagSubfield name="TCRBUB" offset="0" mode="RO"><description>Timer/Counter Controler Register Update Busy</description></flagSubfield>
+                </registerType>
+                <registerType name="TIMSK" width="8" mode="RW">
+                    <description>Timer/Counter Interrupt Mask Register</description>
+                    <flagSubfield name="OCIEB" offset="2"><description>Timer/Counter Output Compare Match B Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="OCIEA" offset="1"><description>Timer/Counter Output Compare Match A Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="TOIE" offset="0"><description>Timer/Counter Overflow Interrupt Enable</description></flagSubfield>
+                </registerType>
+                <registerType name="TIFR" width="8" mode="RW">
+                    <description>Timer/Counter Interrupt Flag Register</description>
+                    <flagSubfield name="OCFB" offset="2"><description>Timer/Counter Output Compare B Match Flag</description></flagSubfield>
+                    <flagSubfield name="OCFA" offset="1"><description>Timer/Counter Output Compare A Match Flag</description></flagSubfield>
+                    <flagSubfield name="TOV" offset="0"><description>Timer/Counter Overflow Flag</description></flagSubfield>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="TCCRA" type="TCCRA" address="0x00"/>
+                <registerInstance name="TCCRB" type="TCCRB" address="0x01"/>
+                <registerInstance name="TCNT" type="TCNT" address="0x02"/>
+                <registerInstance name="OCRA" type="OCR" address="0x03"/>
+                <registerInstance name="OCRB" type="OCR" address="0x04"/>
+                <registerInstance name="ASSR" type="ASSR" address="0x06"/>
+            </layout>
+        </deviceType>
+        <deviceType name="SPI">
+            <description>Serial Peripheral Interface</description>
+            <registerTypeTable>
+                <registerType name="SPCR" width="8" mode="RW">
+                    <description>SPI Control Register</description>
+                    <flagSubfield name="SPIE" offset="7"><description>SPI Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="SPE" offset="6"><description>SPI Enable</description></flagSubfield>
+                    <flagSubfield name="DORD" offset="5"><description>Data Order</description></flagSubfield>
+                    <flagSubfield name="MSTR" offset="4"><description>Master/Slave Select</description></flagSubfield>
+                    <flagSubfield name="CPOL" offset="3"><description>Clock Polarity</description></flagSubfield>
+                    <flagSubfield name="CPHA" offset="2"><description>Clock Phase</description></flagSubfield>
+                    <enumSubfield name="SPR" mask="0x03">
+                        <description>SPI Clock Rate</description>
+                        <enumValue name="OscClockDividedBy4" value="0x00"/>
+                        <enumValue name="OscClockDividedBy16" value="0x01"/>
+                        <enumValue name="OscClockDividedBy64" value="0x02"/>
+                        <enumValue name="OscClockDividedBy128" value="0x03"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="SPSR" width="8" mode="RW">
+                    <flagSubfield name="SPIF" offset="7" mode="RO"><description>SPI Interrupt Flag</description></flagSubfield>
+                    <flagSubfield name="WCOL" offset="6" mode="RO"><description>Write COLlision Flag</description></flagSubfield>
+                    <flagSubfield name="SPI2X" offset="0"><description>Double SPI Speed Bit</description></flagSubfield>
+                </registerType>
+                <registerType name="SPDR" width="8" mode="RW">
+                    <description>SPI Data Register</description>
+                    <integralSubfield name="SPDR" offset="0" width="8"/>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="SPCR" type="SPCR" address="0x00"/>
+                <registerInstance name="SPSR" type="SPSR" address="0x01"/>
+                <registerInstance name="SPDR" type="SPDR" address="0x02"/>
+            </layout>
+        </deviceType>
+        <deviceType name="USART">
+            <description>USART</description>
+            <registerTypeTable>
+                <registerType name="UDR" width="8" mode="RW">
+                    <description>USART I/O Data Register</description>
+                    <integralSubfield name="UDR" offset="0" width="8"/>
+                </registerType>
+                <registerType name="UCSRA" width="8" mode="RW">
+                    <description>USART Control and Status Register A</description>
+                    <flagSubfield name="RXC" offset="7" mode="RO"><description>USART Receive Complete</description></flagSubfield>
+                    <flagSubfield name="TXC" offset="6"><description>USART Transmit Complete</description></flagSubfield>
+                    <flagSubfield name="UDRE" offset="5" mode="RO"><description>USART Data Register Empty</description></flagSubfield>
+                    <flagSubfield name="FE" offset="4" mode="RO"><description>Frame Error</description></flagSubfield>
+                    <flagSubfield name="DOR" offset="3" mode="RO"><description>Data OverRun</description></flagSubfield>
+                    <flagSubfield name="UPE" offset="2" mode="RO"><description>USART Parity Error</description></flagSubfield>
+                    <flagSubfield name="U2X" offset="1"><description>Double the USART Transmission Speed</description></flagSubfield>
+                    <flagSubfield name="MPCM" offset="0"><description>Multi-processor Communication Mode</description></flagSubfield>
+                </registerType>
+                <registerType name="UCSRB" width="8" mode="RW">
+                    <description>USART Control and Status Register B</description>
+                    <flagSubfield name="RXCIE" offset="7"><description>RX Complete Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="TXCIE" offset="6"><description>TX Complete Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="UDRIE" offset="5"><description>USART Data Register Empty Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="RXEN" offset="4"><description>Receiver Enable</description></flagSubfield>
+                    <flagSubfield name="TXEN" offset="3"><description>Transmitter Enable</description></flagSubfield>
+                    <flagSubfield name="UCSZ2" offset="2"><description>Character Size 2</description></flagSubfield>
+                    <flagSubfield name="RXB8" offset="1" mode="RO"><description>Receive Data Bit 8</description></flagSubfield>
+                    <flagSubfield name="TXB8" offset="0"><description>Transmit Data Bit 8</description></flagSubfield>
+                </registerType>
+                <registerType name="UCSRC" width="8" mode="RW">
+                    <description>USART Control and Status Register C</description>
+                    <enumSubfield name="UMSEL" mask="0xC0">
+                        <description>USART Mode Select</description>
+                        <enumValue name="AsyncUSART" value="0x00"/>
+                        <enumValue name="SyncUSART" value="0x40"/>
+                        <enumValue name="MasterSPI" value="0xC0"/>
+                    </enumSubfield>
+                    <enumSubfield name="UPM" mask="0x30">
+                        <description>Parity Mode</description>
+                        <enumValue name="Disabled" value="0x00"/>
+                        <enumValue name="EvenParity" value="0x20"/>
+                        <enumValue name="OddParity" value="0x30"/>
+                    </enumSubfield>
+                    <enumSubfield name="USBS" mask="0x08">
+                        <description>Stop Bit Select</description>
+                        <enumValue name="OneBit" value="0x00"/>
+                        <enumValue name="TwoBit" value="0x08"/>
+                    </enumSubfield>
+                    <enumSubfield name="UCSZ" mask="0x06">
+                        <description>Character Size</description>
+                        <enumValue name="FiveBit" value="0x00"/>
+                        <enumValue name="SixBit" value="0x02"/>
+                        <enumValue name="SevenBit" value="0x04"/>
+                        <enumValue name="EightBit" value="0x06"/>
+                    </enumSubfield>
+                    <enumSubfield name="UCPOL" mask="0x01">
+                        <description>Clock Polarity</description>
+                        <enumValue name="TransmitOnRisingXCK" value="0x00"/>
+                        <enumValue name="TransmitOnFallingXCK" value="0x01"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="UBRR" width="16" mode="RW">
+                    <description>USART Baud Rate Register</description>
+                    <integralSubfield name="UBRR" offset="0" width="12"/>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="UCSRA" type="UCSRA" address="0x00"/>
+                <registerInstance name="UCSRB" type="UCSRB" address="0x01"/>
+                <registerInstance name="UCSRC" type="UCSRC" address="0x02"/>
+                <registerInstance name="UBRR" type="UBRR" address="0x04"/>
+                <registerInstance name="UDR" type="UDR" address="0x06"/>
+            </layout>
+        </deviceType>
+        <deviceType name="TWI">
+            <description>2-wire Serial Interface</description>
+            <registerTypeTable>
+                <registerType name="TWBR" width="8" mode="RW">
+                    <description>TWI Bit Rate Register</description>
+                    <integralSubfield name="TWBR" offset="0" width="8"/>
+                </registerType>
+                <registerType name="TWCR" width="8" mode="RW">
+                    <description>TWI Control Register</description>
+                    <flagSubfield name="TWINT" offset="7"><description>TWI Interrupt Flag</description></flagSubfield>
+                    <flagSubfield name="TWEA" offset="6"><description>TWI Enable Acknowledge Bit</description></flagSubfield>
+                    <flagSubfield name="TWSTA" offset="5"><description>TWI START Condition Bit</description></flagSubfield>
+                    <flagSubfield name="TWSTO" offset="4"><description>TWI STOP Condition  Bit</description></flagSubfield>
+                    <flagSubfield name="TWWC" offset="3" mode="RO"><description>TWI Write Collision Flag</description></flagSubfield>
+                    <flagSubfield name="TWEN" offset="2"><description>TWI Enable Bit</description></flagSubfield>
+                    <flagSubfield name="TWIE" offset="0"><description>TWI Interrupt Enable</description></flagSubfield>
+                </registerType>
+                <registerType name="TWSR" width="8" mode="RW">
+                    <description>TWI Status Register</description>
+                    <integralSubfield name="TWS" offset="3" width="5" mode="RO"><description>TWI Status</description></integralSubfield>
+                    <enumSubfield name="TWPS" mask="0x03">
+                        <description>TWI Prescaler Bits</description>
+                        <enumValue name="One" value="0x00"/>
+                        <enumValue name="Four" value="0x01"/>
+                        <enumValue name="Sixteen" value="0x02"/>
+                        <enumValue name="SixtyFour" value="0x03"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="TWDR" width="8" mode="RW">
+                    <description>TWI Data Register</description>
+                    <integralSubfield name="TWDR" offset="0" width="8"/>
+                </registerType>
+                <registerType name="TWAR" width="8" mode="RW">
+                    <description>TWI (Slave) Address Register</description>
+                    <integralSubfield name="TWAR" offset="1" width="7"/>
+                    <flagSubfield name="TWGCE" offset="0"><description>TWI General Call Recognition Enable Bit</description></flagSubfield>
+                </registerType>
+                <registerType name="TWAMR" width="8" mode="RW">
+                    <description>TWI (Slave) Address Mask Register</description>
+                    <integralSubfield name="TWAMR" offset="1" width="7"/>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="TWBR" type="TWBR" address="0x00"/>
+                <registerInstance name="TWSR" type="TWSR" address="0x01"/>
+                <registerInstance name="TWAR" type="TWAR" address="0x02"/>
+                <registerInstance name="TWDR" type="TWDR" address="0x03"/>
+                <registerInstance name="TWCR" type="TWCR" address="0x04"/>
+                <registerInstance name="TWAMR" type="TWAMR" address="0x05"/>
+            </layout>
+        </deviceType>
+        <deviceType name="ADC">
+            <description>Analog to Digital Converter</description>
+            <registerTypeTable>
+                <registerType name="ACSR" width="8" mode="RW">
+                    <description>Analog Comparator Control and Status Register</description>
+                    <flagSubfield name="ACD" offset="7"><description>Analog Comparator Disable</description></flagSubfield>
+                    <flagSubfield name="ACBG" offset="6"><description>Analog Comparator Bandgap Select</description></flagSubfield>
+                    <flagSubfield name="ACO" offset="5" mode="RO"><description>Analog Comparator Output</description></flagSubfield>
+                    <flagSubfield name="ACI" offset="4"><description>Analog Comparator Interrupt Flag</description></flagSubfield>
+                    <flagSubfield name="ACIE" offset="3"><description>Analog Comparator Interrupt Enable</description></flagSubfield>
+                    <flagSubfield name="ACIC" offset="2"><description>Analog Comparator Input Capture Enable</description></flagSubfield>
+                    <enumSubfield name="ACIS" mask="0x03">
+                        <description>Analog Comparator Interrupt Mode Select</description>
+                        <enumValue name="Toggle" value="0x00"/>
+                        <enumValue name="FallingEdge" value="0x02"/>
+                        <enumValue name="RisingEdge" value="0x03"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="ADMUX" width="8" mode="RW">
+                    <description>ADC Multiplexer Selection Register</description>
+                    <enumSubfield name="REFS" mask="0xC0">
+                        <description>Reference Selection Bits</description>
+                        <enumValue name="AREF" value="0x00"/>
+                        <enumValue name="AVCC" value="0x40"/>
+                        <enumValue name="Internal_1V1" value="0x80"/>
+                        <enumValue name="Internal_2V56" value="0xC0"/>
+                    </enumSubfield>
+                    <flagSubfield name="ADLAR" offset="5"><description>ADC Left Adjust Result</description></flagSubfield>
+                    <integralSubfield name="MUX" offset="0" width="5"><description>Analog Channel and Gain Selection Bits</description></integralSubfield>
+                </registerType>
+                <registerType name="ADCSRB" width="8" mode="RW">
+                    <description>ADC Control and Status Register B</description>
+                    <flagSubfield name="ACME" offset="6"><description>Analog Comparator Multiplexer Enable</description></flagSubfield>
+                    <flagSubfield name="MUX5" offset="3"><description>Analog Channel and Gain Selection Bit</description></flagSubfield>
+                    <enumSubfield name="ADTS" mask="0x07">
+                        <description>ADC Auto Trigger Source</description>
+                        <enumValue name="FreeRunning" value="0x00"/>
+                        <enumValue name="AnalogComparator" value="0x01"/>
+                        <enumValue name="ExternalInterrupt" value="0x02"/>
+                        <enumValue name="Timer0CompareMatchA" value="0x03"/>
+                        <enumValue name="Timer0Overflow" value="0x04"/>
+                        <enumValue name="Timer0CompareMatchB" value="0x05"/>
+                        <enumValue name="Timer1Overflow" value="0x06"/>
+                        <enumValue name="Timer1CaptureEvent" value="0x07"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="ADCSRA" width="8" mode="RW">
+                    <description>ADC Control and Status Register A</description>
+                    <flagSubfield name="ADEN" offset="7"><description>ADC Enable</description></flagSubfield>
+                    <flagSubfield name="ADSC" offset="6"><description>ADC Start Conversion</description></flagSubfield>
+                    <flagSubfield name="ADATE" offset="5"><description>ADC Auto Trigger Enable</description></flagSubfield>
+                    <flagSubfield name="ADIF" offset="4"><description>ADC Interrupt Flag</description></flagSubfield>
+                    <flagSubfield name="ADIE" offset="3"><description>ADC Interrupt Enable</description></flagSubfield>
+                    <enumSubfield name="ADPS" mask="0x07">
+                        <description>ADC Prescaler Select Bits</description>
+                        <enumValue name="DivideBy1" value="0x00"/>
+                        <enumValue name="DivideBy2" value="0x01"/>
+                        <enumValue name="DivideBy4" value="0x02"/>
+                        <enumValue name="DivideBy8" value="0x03"/>
+                        <enumValue name="DivideBy16" value="0x04"/>
+                        <enumValue name="DivideBy32" value="0x05"/>
+                        <enumValue name="DivideBy64" value="0x06"/>
+                        <enumValue name="DivideBy128" value="0x07"/>
+                    </enumSubfield>
+                </registerType>
+                <registerType name="ADC" width="8" mode="RO">
+                    <description>ADC Data Register</description>
+                    <integralSubfield name="ADC" width="8" offset="0"/>
+                </registerType>
+                <registerType name="DIDR0" width="8" mode="RW">
+                    <description>Digital Input Disable Register 0</description>
+                    <flagSubfield name="ADC7D" offset="7"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC6D" offset="6"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC5D" offset="5"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC4D" offset="4"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC3D" offset="3"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC2D" offset="2"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC1D" offset="1"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC0D" offset="0"><description>Digital Input Disable</description></flagSubfield>
+                </registerType>
+                <registerType name="DIDR2" width="8" mode="RW">
+                    <description>Digital Input Disable Register 2</description>
+                    <flagSubfield name="ADC15D" offset="7"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC14D" offset="6"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC13D" offset="5"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC12D" offset="4"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC11D" offset="3"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC10D" offset="2"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC9D" offset="1"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="ADC8D" offset="0"><description>Digital Input Disable</description></flagSubfield>
+                </registerType>
+                <registerType name="DIDR1" width="8" mode="RW">
+                    <description>Digital Input Disable Register 1</description>
+                    <flagSubfield name="AIN1D" offset="1"><description>Digital Input Disable</description></flagSubfield>
+                    <flagSubfield name="AIN0D" offset="0"><description>Digital Input Disable</description></flagSubfield>
+                </registerType>
+            </registerTypeTable>
+            <layout>
+                <registerInstance name="ADCL" type="ADC" address="0x00"/>
+                <registerInstance name="ADCH" type="ADC" address="0x01"/>
+                <registerInstance name="ADCSRA" type="ADCSRA" address="0x02"/>
+                <registerInstance name="ADCSRB" type="ADCSRB" address="0x03"/>
+                <registerInstance name="ADMUX" type="ADMUX" address="0x04"/>
+                <registerInstance name="DIDR2" type="DIDR2" address="0x05"/>
+                <registerInstance name="DIDR0" type="DIDR0" address="0x06"/>
+                <registerInstance name="DIDR1" type="DIDR1" address="0x07"/>
+            </layout>
+        </deviceType>
+    </deviceTypeTable>
+
+    <layout>
+        <deviceInstance name="GPIOA" type="GPIO8CH" address="0x020"/>
+        <deviceInstance name="GPIOB" type="GPIO8CH" address="0x023"/>
+        <deviceInstance name="GPIOC" type="GPIO8CH" address="0x026"/>
+        <deviceInstance name="GPIOD" type="GPIO8CH" address="0x029"/>
+        <deviceInstance name="GPIOE" type="GPIO8CH" address="0x02C"/>
+        <deviceInstance name="GPIOF" type="GPIO8CH" address="0x02F"/>
+        <deviceInstance name="GPIOG" type="GPIO6CH" address="0x032"/>
+        <registerInstance name="TIFR0" type="Timer8B::TIFR" address="0x035"/>
+        <registerInstance name="TIFR1" type="Timer16B::TIFR" address="0x036"/>
+        <registerInstance name="TIFR2" type="Timer8BAsync::TIFR" address="0x037"/>
+        <registerInstance name="TIFR3" type="Timer16B::TIFR" address="0x038"/>
+        <registerInstance name="TIFR4" type="Timer16B::TIFR" address="0x039"/>
+        <registerInstance name="TIFR5" type="Timer16B::TIFR" address="0x03A"/>
+        <registerInstance name="PCIFR" type="PCIFR" address="0x03B"/>
+        <registerInstance name="EIFR" type="EIFR" address="0x03C"/>
+        <registerInstance name="EIMSK" type="EIMSK" address="0x03D"/>
+        <registerInstance name="GPIOR0" type="GPIOR" address="0x03E"/>
+        <deviceInstance name="EEPROM" type="EEPROM" address="0x03F"/>
+        <registerInstance name="GTCCR" type="GTCCR" address="0x043"/>
+        <deviceInstance name="Timer0" type="Timer8B" address="0x044">
+            <relatedRegister name="TIFR0"/>
+            <relatedRegister name="TIMSK0"/>
+        </deviceInstance>
+        <registerInstance name="GPIOR1" type="GPIOR" address="0x03A"/>
+        <registerInstance name="GPIOR2" type="GPIOR" address="0x03B"/>
+        <deviceInstance name="SPI" type="SPI" address="0x04C"/>
+        <registerInstance name="ACSR" type="ADC::ACSR" address="0x050"/>
+        <registerInstance name="OCDR" type="OCDR" address="0x051"/>
+        <registerInstance name="SMCR" type="SMCR" address="0x053"/>
+        <registerInstance name="MCUSR" type="MCUSR" address="0x054"/>
+        <registerInstance name="MCUCR" type="MCUCR" address="0x055"/>
+        <registerInstance name="SPMCSR" type="SPMCSR" address="0x057"/>
+        <registerInstance name="RAMPZ" type="RAMPZ" address="0x05B"/>
+        <registerInstance name="EIND" type="EIND" address="0x05C"/>
+        <registerInstance name="SP" type="SP" address="0x05D"/>
+        <registerInstance name="SREG" type="SREG" address="0x05F"/>
+        <registerInstance name="WDTCSR" type="WDTCSR" address="0x060"/>
+        <registerInstance name="CLKPR" type="CLKPR" address="0x061"/>
+        <registerInstance name="CLKPR" type="CLKPR" address="0x061"/>
+        <registerInstance name="PRR0" type="PRR0" address="0x064"/>
+        <registerInstance name="PRR1" type="PRR1" address="0x065"/>
+        <registerInstance name="OSCCAL" type="OSCCAL" address="0x066"/>
+        <registerInstance name="PCICR" type="PCICR" address="0x068"/>
+        <registerInstance name="EICRA" type="EICRA" address="0x069"/>
+        <registerInstance name="EICRB" type="EICRB" address="0x06A"/>
+        <registerInstance name="PCMSK0" type="PCMSK0" address="0x06B"/>
+        <registerInstance name="PCMSK1" type="PCMSK1" address="0x06C"/>
+        <registerInstance name="PCMSK2" type="PCMSK2" address="0x06D"/>
+        <registerInstance name="TIMSK0" type="Timer8B::TIMSK" address="0x06E"/>
+        <registerInstance name="TIMSK1" type="Timer16B::TIMSK" address="0x06F"/>
+        <registerInstance name="TIMSK2" type="Timer8BAsync::TIMSK" address="0x070"/>
+        <registerInstance name="TIMSK3" type="Timer16B::TIMSK" address="0x071"/>
+        <registerInstance name="TIMSK4" type="Timer16B::TIMSK" address="0x072"/>
+        <registerInstance name="TIMSK5" type="Timer16B::TIMSK" address="0x073"/>
+        <registerInstance name="XMCRA" type="XMCRA" address="0x074"/>
+        <registerInstance name="XMCRB" type="XMCRB" address="0x075"/>
+        <deviceInstance name="ADC" type="ADC" address="0x078">
+            <relatedRegister name="ACSR"/>
+        </deviceInstance>
+        <deviceInstance name="Timer1" type="Timer16B" address="0x080">
+            <relatedRegister name="TIFR1"/>
+            <relatedRegister name="TIMSK1"/>
+        </deviceInstance>
+        <deviceInstance name="Timer3" type="Timer16B" address="0x090">
+            <relatedRegister name="TIFR3"/>
+            <relatedRegister name="TIMSK3"/>
+        </deviceInstance>
+        <deviceInstance name="Timer4" type="Timer16B" address="0x0A0">
+            <relatedRegister name="TIFR4"/>
+            <relatedRegister name="TIMSK4"/>
+        </deviceInstance>
+        <deviceInstance name="Timer2" type="Timer8BAsync" address="0x0B0">
+            <relatedRegister name="TIFR2"/>
+            <relatedRegister name="TIMSK2"/>
+        </deviceInstance>
+        <deviceInstance name="TWI" type="TWI" address="0x0B8"/>
+        <deviceInstance name="USART0" type="USART" address="0x0C0"/>
+        <deviceInstance name="USART1" type="USART" address="0x0C8"/>
+        <deviceInstance name="USART2" type="USART" address="0x0D0"/>
+        <deviceInstance name="GPIOH" type="GPIO8CH" address="0x100"/>
+        <deviceInstance name="GPIOJ" type="GPIO8CH" address="0x103"/>
+        <deviceInstance name="GPIOK" type="GPIO8CH" address="0x106"/>
+        <deviceInstance name="GPIOL" type="GPIO8CH" address="0x109"/>
+        <deviceInstance name="Timer5" type="Timer16B" address="0x120">
+            <relatedRegister name="TIFR5"/>
+            <relatedRegister name="TIMSK5"/>
+        </deviceInstance>
+        <deviceInstance name="USART3" type="USART" address="0x130"/>
+    </layout>
+
+    <interruptTable>
+        <interrupt name="RESET" number="1" address="0x0000"/>
+        <interrupt name="INT0" number="2" address="0x0002"/>
+        <interrupt name="INT1" number="3" address="0x0004"/>
+        <interrupt name="INT2" number="4" address="0x0006"/>
+        <interrupt name="INT3" number="5" address="0x0008"/>
+        <interrupt name="INT4" number="6" address="0x000A"/>
+        <interrupt name="INT5" number="7" address="0x000C"/>
+        <interrupt name="INT6" number="8" address="0x000E"/>
+        <interrupt name="INT7" number="9" address="0x0010"/>
+        <interrupt name="PCINT0" number="10" address="0x0012"/>
+        <interrupt name="PCINT1" number="11" address="0x0014"/>
+        <interrupt name="PCINT2" number="12" address="0x0016"/>
+        <interrupt name="WDT" number="13" address="0x0018"/>
+        <interrupt name="TIM2_COMPA" number="14" address="0x001A"/>
+        <interrupt name="TIM2_COMPB" number="15" address="0x001C"/>
+        <interrupt name="TIM2_OVF" number="16" address="0x001E"/>
+        <interrupt name="TIM1_CAPT" number="17" address="0x0020"/>
+        <interrupt name="TIM1_COMPA" number="18" address="0x0022"/>
+        <interrupt name="TIM1_COMPB" number="19" address="0x0024"/>
+        <interrupt name="TIM1_COMPC" number="20" address="0x0026"/>
+        <interrupt name="TIM1_OVF" number="21" address="0x0028"/>
+        <interrupt name="TIM0_COMPA" number="22" address="0x002A"/>
+        <interrupt name="TIM0_COMPB" number="23" address="0x002C"/>
+        <interrupt name="TIM0_OVF" number="24" address="0x002E"/>
+        <interrupt name="SPI_STC" number="25" address="0x0030"/>
+        <interrupt name="USART0_RXC" number="26" address="0x0032"/>
+        <interrupt name="USART0_UDRE" number="27" address="0x0034"/>
+        <interrupt name="USART0_TXC" number="28" address="0x0036"/>
+        <interrupt name="ANA_COMP" number="29" address="0x0038"/>
+        <interrupt name="ADC" number="30" address="0x003A"/>
+        <interrupt name="EE_RDY" number="31" address="0x003C"/>
+        <interrupt name="TIM3_CAPT" number="32" address="0x003E"/>
+        <interrupt name="TIM3_COMPA" number="33" address="0x0040"/>
+        <interrupt name="TIM3_COMPB" number="34" address="0x0042"/>
+        <interrupt name="TIM3_COMPC" number="35" address="0x0044"/>
+        <interrupt name="TIM3_OVF" number="36" address="0x0046"/>
+        <interrupt name="USART1_RXC" number="37" address="0x0048"/>
+        <interrupt name="USART1_UDRE" number="38" address="0x004A"/>
+        <interrupt name="USART1_TXC" number="39" address="0x004C"/>
+        <interrupt name="TWI" number="40" address="0x004E"/>
+        <interrupt name="SPM_RDY" number="41" address="0x0050"/>
+        <interrupt name="TIM4_CAPT" number="42" address="0x0052"/>
+        <interrupt name="TIM4_COMPA" number="43" address="0x0054"/>
+        <interrupt name="TIM4_COMPB" number="44" address="0x0056"/>
+        <interrupt name="TIM4_COMPC" number="45" address="0x0058"/>
+        <interrupt name="TIM4_OVF" number="46" address="0x005A"/>
+        <interrupt name="TIM5_CAPT" number="47" address="0x005C"/>
+        <interrupt name="TIM5_COMPA" number="48" address="0x005E"/>
+        <interrupt name="TIM5_COMPB" number="49" address="0x0060"/>
+        <interrupt name="TIM5_COMPC" number="50" address="0x0062"/>
+        <interrupt name="TIM5_OVF" number="51" address="0x0064"/>
+        <interrupt name="USART2_RXC" number="52" address="0x0066"/>
+        <interrupt name="USART2_UDRE" number="53" address="0x0068"/>
+        <interrupt name="USART2_TXC" number="54" address="0x006A"/>
+        <interrupt name="USART3_RXC" number="55" address="0x006C"/>
+        <interrupt name="USART3_UDRE" number="56" address="0x006E"/>
+        <interrupt name="USART3_TXC" number="57" address="0x0070"/>
+    </interruptTable>
+</soc>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soc name="atmega2560">
+    <description>ATmega2560 definition</description>
+    <include location="cores/atmega_xx0_1_core.xml"/>
+
+    <constantTable>
+        <constant name="FLASH_SIZE" type="int32_t" value="0x40000"/>
+    </constantTable>
+</soc>
