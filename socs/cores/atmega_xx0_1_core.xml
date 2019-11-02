@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 $openHWIDL$
 -->
-<soc name="atmega_xx0_1_core" partial="true">
+<soc manufacturer="atmel" family="atmega" name="atmega_xx0_1_core" partial="true">
     <description>ATmega 640, 1280, 1281, 2560 and 2561 core definition</description>
 
     <constantTable>
